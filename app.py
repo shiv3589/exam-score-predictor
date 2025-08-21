@@ -6,14 +6,24 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 import plotly.express as px
 import plotly.graph_objects as go
+import os
+
+# Railway deployment configuration
+if any(env in os.environ for env in ['RAILWAY_ENVIRONMENT', 'RAILWAY_STATIC_URL']):
+    os.environ['STREAMLIT_BROWSER_GATHER_USAGE_STATS'] = 'false'
+    os.environ['STREAMLIT_SERVER_HEADLESS'] = 'true'
 
 # Page configuration
-st.set_page_config(
-    page_title="Exam Score Predictor",
-    page_icon="📚",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+try:
+    st.set_page_config(
+        page_title="Exam Score Predictor",
+        page_icon="📚",
+        layout="wide",
+        initial_sidebar_state="expanded"
+    )
+except Exception:
+    # Handle deployment environments that don't support page config
+    pass
 
 # Main title and introduction
 st.title("📚 Exam Score Predictor")
@@ -212,9 +222,9 @@ elif page == "🤖 Model Details":
         
         # Show prediction comparison
         comparison_df = pd.DataFrame({
-            "Actual Score": y_test.values,
+            "Actual Score": y_test,
             "Predicted Score": y_pred,
-            "Difference": y_test.values - y_pred
+            "Difference": y_test - y_pred
         })
         
         st.write("**Test Set Predictions:**")
